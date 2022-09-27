@@ -6,12 +6,12 @@ import (
 )
 
 type Person struct {
-	Name  string `json:"PersonName"` // reflection mechanism
+	Name  string
 	Age   int
 	Skill string
 }
 
-func NewPerson() {
+func NewPerson() string {
 	person := Person{
 		Name:  "Wang lu",
 		Age:   20,
@@ -24,6 +24,7 @@ func NewPerson() {
 	}
 	// output after serialization
 	fmt.Printf("After serialization=%v, the type is=%T\n", string(data), string(data))
+	return string(data)
 }
 
 func NewMap() string {
@@ -42,7 +43,7 @@ func NewMap() string {
 }
 
 // define a slice with multiple key/value pairs
-func NewSlice() {
+func NewSlice() string {
 	var slice []map[string]interface{}
 	// Need to run make before using map
 	m1 := make(map[string]interface{})
@@ -62,6 +63,39 @@ func NewSlice() {
 	}
 	// output after serialization
 	fmt.Printf("After serialization=%v, the type is=%T\n", string(data), string(data))
+	return string(data)
+}
+
+func unmarshalStruct() {
+	str := NewPerson()
+	var person Person
+	// deserialize (JSON string to Struct type)
+	err := json.Unmarshal([]byte(str), &person)
+	if err != nil {
+		fmt.Printf("unmarshal err=%v\n", err)
+	}
+	fmt.Println("Deserialze to Struct => person: ", person)
+}
+
+func unmarshalMap() {
+	str := NewMap()
+	var m map[string]interface{}
+	// deserialize (JSON string to Struct type)
+	err := json.Unmarshal([]byte(str), &m)
+	if err != nil {
+		fmt.Printf("unmarshal err=%v\n", err)
+	}
+	fmt.Println("Deserialze to Struct => Map: ", m)
+}
+
+func unmarshalSlice() {
+	str := NewSlice()
+	var slice []map[string]interface{}
+	err := json.Unmarshal([]byte(str), &slice)
+	if err != nil {
+		fmt.Printf("unmarshal err=%v\n", err)
+	}
+	fmt.Println("Deserialze to Struct => Slice: ", slice)
 }
 
 func main() {
@@ -71,4 +105,10 @@ func main() {
 	NewMap()
 	// serialize (slice) -> json string
 	NewSlice()
+	// deserialzie (JSON string) -> Struct
+	unmarshalStruct()
+	// deserialzie (JSON string) -> Map
+	unmarshalMap()
+	// deserialzie (JSON string) -> Slice
+	unmarshalSlice()
 }
