@@ -9,13 +9,20 @@ import (
 func main() {
 	intChan := make(chan int, 10)
 	strChan := make(chan string, 5)
-	for i := 1; i <= 10; i++ {
-		intChan <- i
-	}
-	for i := 1; i <= 5; i++ {
-		strChan <- "Hello" + fmt.Sprintf("%d", i)
-	}
-
+	// read int numbers to intChan
+	go func(ch chan int) {
+		for i := 1; i <= 10; i++ {
+			ch <- i
+		}
+	}(intChan)
+	// write strings to strChan
+	go func(ch chan string) {
+		for i := 1; i <= 5; i++ {
+			ch <- "Hello" + fmt.Sprintf("%d", i)
+		}
+	}(strChan)
+	// let main wait for 3seconds until write operations to complete
+	time.Sleep(time.Second * 3)
 	// select
 	// label:
 	for {
