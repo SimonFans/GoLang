@@ -13,4 +13,16 @@ func main() {
 	// unsafe.Sizeof(b) returns how many bits it takes. 1 byte = 8 bits
 	var b int = 255
 	fmt.Printf("b is a type of %T, it takes bytes:%d\n", b, unsafe.Sizeof(b))
+	num := 1.5e-2
+	fmt.Println(num)
+	// Print result: int32 => 97 a
+	c1 := 'a'
+	fmt.Printf("%T => %v %c\n", c1, c1, c1)
+	// c2=Ü
+	var c2 int = 220
+	fmt.Printf("c2=%c\n", c2)
+	// Print raw statement
+	str_raw := `package main
+import "fmt"`
+	fmt.Println(str_raw)
 }
