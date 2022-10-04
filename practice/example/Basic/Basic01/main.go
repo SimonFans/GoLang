@@ -25,4 +25,20 @@ func main() {
 	str_raw := `package main
 import "fmt"`
 	fmt.Println(str_raw)
+	// "99
+	num1 := 99
+	num1_to_str := fmt.Sprintf("%d", num1)
+	fmt.Printf("%q\n", num1_to_str)
+	// "23.456000"
+	num2 := 23.456
+	num2_to_str := fmt.Sprintf("%f", num2)
+	fmt.Printf("%q\n", num2_to_str)
+	// "true"
+	logic := true
+	logic_to_str := fmt.Sprintf("%t", logic)
+	fmt.Printf("%q\n", logic_to_str)
+	// "h"
+	char1 := 'h'
+	char_to_str := fmt.Sprintf("%c", char1)
+	fmt.Printf("%q\n", char_to_str)
 }
