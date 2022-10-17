@@ -21,14 +21,14 @@ func main() {
 	// FieldByName return a StructField struct which includes many fields you can call such as Tag
 	f, _ := t.FieldByName("Name")
 	nameTagVal := f.Tag.Get("yaml")
-	fmt.Println(nameTagVal)
-	fmt.Println(reflect.TypeOf(nameTagVal))
+	fmt.Println(nameTagVal)                 // 1
+	fmt.Println(reflect.TypeOf(nameTagVal)) // string
 
 	// S is a Type
 	s := reflect.TypeOf(S{})
 	fmt.Printf("Type=%v, Kind=%v\n", s, s.Kind())
 	// return structfield -> call .Tag => color:"Blue" model:"Honda"
 	f1 := s.Field(0).Tag
-	fmt.Println(f1)
+	fmt.Println(f1) // color:"Blue" model:"Honda"
 	fmt.Printf("color=%v, model=%v\n", f1.Get("color"), f1.Get("model"))
 }
