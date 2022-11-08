@@ -83,6 +83,7 @@ func DeleteHeroNode(head *HeroNode, id int) {
 func main() {
 	// create a empty headNode
 	head := &HeroNode{}
+	// insert new hero nodes
 	hero1 := &HeroNode{no: 1, name: "Ximeng"}
 	hero3 := &HeroNode{no: 3, name: "Niu"}
 	hero2 := &HeroNode{no: 2, name: "Mai"}
