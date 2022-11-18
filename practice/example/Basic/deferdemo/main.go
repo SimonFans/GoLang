@@ -10,7 +10,14 @@ func TwoSum(n1, n2 int) int {
 	return res
 }
 
+func deferTest(n int) int {
+	defer fmt.Printf("defer n=%v\n", n)
+	fmt.Println("start...")
+	return n
+}
+
 func main() {
 	res := TwoSum(10, 20)
 	fmt.Printf("Main res=%v\n", res) // 4
+	fmt.Println(deferTest(5))
 }
