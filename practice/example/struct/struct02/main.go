@@ -11,12 +11,6 @@ const (
 	AgeSet  = "0123456789"
 )
 
-type Student struct {
-	Name  string
-	Score func(int) *int
-	Age   int
-}
-
 func GenerateRandomStudentName(n int) string {
 	name := make([]byte, n)
 	for index := range name {
@@ -38,18 +32,32 @@ func GenerateRandomAge() int {
 	return ageVal
 }
 
-func GetScore(x int) func(int) *int {
-	return func(x int) *int {
-		result := x * 2
-		return &result
+type Student struct {
+	Name  string
+	Score func(int) *int
+	Age   int
+}
+
+func NewStudent(name string, op func(int) *int, age int) *Student {
+	return &Student{
+		Name:  name,
+		Score: op,
+		Age:   age,
 	}
 }
 
+func (stu *Student) CalculateScore(num int) *int {
+	return stu.Score(num)
+}
+
+func GetScore(num int) *int {
+	return &num
+}
+
 func main() {
-	studentA := Student{
-		Name:  GenerateRandomStudentName(5),
-		Age:   GenerateRandomAge(),
-		Score: GetScore(10),
-	}
-	fmt.Println(studentA.Score(20))
+	stuA := NewStudent(GenerateRandomStudentName(5), GetScore, GenerateRandomAge())
+	fmt.Printf("%+v\n", stuA)
+	stuA.CalculateScore(5)
+	fmt.Printf("%+v\n", stuA)
+	// fmt.Println(studentA.Score(20))
 }
