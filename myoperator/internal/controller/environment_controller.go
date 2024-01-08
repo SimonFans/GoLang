@@ -19,10 +19,12 @@ package controller
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	envv1alpha1 "myoperator/api/v1alpha1"
 )
@@ -50,6 +52,16 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	_ = log.FromContext(ctx)
 
 	// TODO(user): your logic here
+	env := &envv1alpha1.Environment{}
+	err := r.Get(ctx, req.NamespacedName, env)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Environment CR is not found, may have been deleted
+			return reconcile.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		return reconcile.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
