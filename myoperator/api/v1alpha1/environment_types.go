@@ -23,12 +23,12 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-const (
-	FinalizerKubernetes FinalizerName = "kubernetes"
-)
+// const (
+// 	FinalizerKubernetes FinalizerName = "kubernetes"
+// )
 
 // FinalizerName is the name identifying a finalizer during namespace lifecycle.
-type FinalizerName string
+// type FinalizerName string
 
 // EnvironmentSpec defines the desired state of Environment
 type EnvironmentSpec struct {
@@ -36,32 +36,8 @@ type EnvironmentSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Finalizers is an opaque list of values that must be empty to permanently remove object from storage
-	Finalizers []FinalizerName `json:"finalizers,omitempty"`
+	// Finalizers []FinalizerName `json:"finalizers,omitempty"`
 }
-
-// EnvironmentPhase defines the phase in which the Environment is
-type EnvironmentPhase string
-
-// These are the valid phases of a Environment.
-const (
-	// EnvironmentActive means the Environment is available for use in the system
-	EnvironmentActive EnvironmentPhase = "Active"
-	// EnvironmentTerminating means the Environment is undergoing graceful termination
-	EnvironmentTerminating EnvironmentPhase = "Terminating"
-)
-
-// ConditionStatus defines conditions of resources
-type ConditionStatus string
-
-// These are valid condition statuses. "ConditionTrue" means a resource is in the condition;
-// "ConditionFalse" means a resource is not in the condition; "ConditionUnknown" means kubernetes
-// can't decide if a resource is in the condition or not. In the future, we could add other
-// intermediate conditions, e.g. ConditionDegraded.
-const (
-	ConditionTrue    ConditionStatus = "True"
-	ConditionFalse   ConditionStatus = "False"
-	ConditionUnknown ConditionStatus = "Unknown"
-)
 
 // EnvironmentStatus defines the observed state of Environment
 type EnvironmentStatus struct {
@@ -69,33 +45,6 @@ type EnvironmentStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 	// Phase is the current lifecycle phase of the Environment.
 	// +optional
-	Phase EnvironmentPhase `json:"phase,omitempty"`
-	// +optional
-	Conditions []EnvironmentCondition `json:"conditions,omitempty"`
-}
-
-// EnvironmentConditionType defines constants reporting on status during namespace lifetime and deletion progress
-type EnvironmentConditionType string
-
-// These are valid conditions of a Environment.
-const (
-	EnvironmentDeletionDiscoveryFailure EnvironmentConditionType = "NamespaceDeletionDiscoveryFailure"
-	EnvironmentDeletionContentFailure   EnvironmentConditionType = "NamespaceDeletionContentFailure"
-	EnvironmentDeletionGVParsingFailure EnvironmentConditionType = "NamespaceDeletionGroupVersionParsingFailure"
-)
-
-// EnvironmentCondition contains details about state of Environment.
-type EnvironmentCondition struct {
-	// Type of namespace controller condition.
-	Type EnvironmentConditionType `json:"type,omitempty"`
-	// Status of the condition, one of True, False, Unknown.
-	Status ConditionStatus `json:"status,omitempty"`
-	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-	// +optional
-	Reason string `json:"reason,omitempty"`
-	// +optional
-	Message string `json:"message,omitempty"`
 }
 
 //+kubebuilder:object:root=true
