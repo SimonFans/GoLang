@@ -100,6 +100,7 @@ type EnvironmentCondition struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:scope=Cluster
 
 // Environment is the Schema for the environments API
 type Environment struct {
