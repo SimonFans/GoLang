@@ -76,6 +76,11 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	err = r.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)
 	if err != nil && errors.IsNotFound(err) {
 		// Namespace does not exist, create it
+		if !env.ObjectMeta.DeletionTimestamp.IsZero() {
+			// Skip creating the namespace if the Environment CR is being deleted
+			return reconcile.Result{}, nil
+		}
+
 		namespace = &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: namespaceName,
