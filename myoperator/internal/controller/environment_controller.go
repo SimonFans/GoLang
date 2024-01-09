@@ -148,6 +148,9 @@ func (r *EnvironmentReconciler) Delete(ctx context.Context, req reconcile.Reques
 		return reconcile.Result{}, err
 	}
 
+	l := log.FromContext(ctx)
+	l.Info("Reconcile delete", "req", req)
+
 	return reconcile.Result{}, nil
 }
 
