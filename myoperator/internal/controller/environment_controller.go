@@ -85,7 +85,7 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			return reconcile.Result{}, err
 		}
 
-		if err := r.Create(ctx, namespace); err != nil {
+		if err := r.Client.Create(ctx, namespace); err != nil {
 			return reconcile.Result{}, err
 		}
 
@@ -104,6 +104,51 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// Namespace already exists, nothing to do
 	return reconcile.Result{}, nil
 
+}
+
+// Delete is called when an Environment resource is deleted
+func (r *EnvironmentReconciler) Delete(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
+	// Fetch the Environment CR
+	environment := &envv1alpha1.Environment{}
+	err := r.Get(ctx, req.NamespacedName, environment)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Environment CR not found, may have been deleted
+			return reconcile.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		return reconcile.Result{}, err
+	}
+
+	// Fetch the corresponding namespace
+	namespaceName := environment.Name
+	namespace := &corev1.Namespace{}
+	err = r.Get(ctx, client.ObjectKey{Name: namespaceName}, namespace)
+	if err != nil && errors.IsNotFound(err) {
+		// Namespace not found, nothing to delete
+		return reconcile.Result{}, nil
+	} else if err != nil {
+		// Error fetching the namespace - requeue the request.
+		return reconcile.Result{}, err
+	}
+
+	// Delete the namespace
+	if err := r.Client.Delete(ctx, namespace); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	// Delete the Environment CR
+	if err := r.Client.Delete(ctx, environment); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	// Update status to reflect deletion
+	environment.Status.NamespaceCreated = false
+	if err := r.Status().Update(ctx, environment); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	return reconcile.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
