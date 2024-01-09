@@ -53,7 +53,10 @@ type EnvironmentReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
 func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	// _ = log.FromContext(ctx)
+	l := log.FromContext(ctx)
+	l.Info("Reconcile", "req", req)
+	// l.Info("Enter Reconcile ", req)
 
 	// TODO(user): your logic here
 	env := &envv1alpha1.Environment{}
