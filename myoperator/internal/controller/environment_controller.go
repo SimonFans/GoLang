@@ -19,10 +19,14 @@ package controller
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
@@ -63,12 +67,50 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 
-	return ctrl.Result{}, nil
+	// Check if the corresponding namespace exists
+	namespaceName := env.Name
+	namespace := &corev1.Namespace{}
+	err = r.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)
+	if err != nil && errors.IsNotFound(err) {
+		// Namespace does not exist, create it
+		namespace = &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: namespaceName,
+			},
+		}
+		if err := controllerutil.SetControllerReference(env, namespace, r.Scheme); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		if err := r.Create(ctx, namespace); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		// Namespace created successfully, update status
+		env.Status.NamespaceCreated = true
+		if err := r.Status().Update(ctx, env); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		return reconcile.Result{Requeue: true}, nil
+	} else if err != nil {
+		// Error fetching the namespace - requeue the request.
+		return reconcile.Result{}, err
+	}
+
+	// Namespace already exists, nothing to do
+	return reconcile.Result{}, nil
+
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *EnvironmentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&envv1alpha1.Environment{}).
+		Owns(&corev1.Namespace{}).
+		// Watches(
+		// 	&source.Kind{Type: &envv1alpha1.Environment{}},
+		// 	&handler.EnqueueRequestForOwner{OwnerType: &envv1alpha1.Environment{}},
+		// ).
 		Complete(r)
 }

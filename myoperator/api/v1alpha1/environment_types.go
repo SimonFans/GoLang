@@ -45,6 +45,7 @@ type EnvironmentStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 	// Phase is the current lifecycle phase of the Environment.
 	// +optional
+	NamespaceCreated bool `json:"namespaceCreated,omitempty"`
 }
 
 //+kubebuilder:object:root=true
