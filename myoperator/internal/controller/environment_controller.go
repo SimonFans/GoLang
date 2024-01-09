@@ -76,11 +76,6 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	err = r.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)
 	if err != nil && errors.IsNotFound(err) {
 		// Namespace does not exist, create it
-		if !env.ObjectMeta.DeletionTimestamp.IsZero() {
-			// Skip creating the namespace if the Environment CR is being deleted
-			return reconcile.Result{}, nil
-		}
-
 		namespace = &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: namespaceName,
@@ -106,58 +101,63 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 
+	if !env.ObjectMeta.DeletionTimestamp.IsZero() {
+		// Skip creating the namespace if the Environment CR is being deleted
+		return reconcile.Result{}, nil
+	}
+
 	// Namespace already exists, nothing to do
 	return reconcile.Result{}, nil
 
 }
 
 // Delete is called when an Environment resource is deleted
-func (r *EnvironmentReconciler) Delete(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
-	// Fetch the Environment CR
-	environment := &envv1alpha1.Environment{}
-	err := r.Get(ctx, req.NamespacedName, environment)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			// Environment CR not found, may have been deleted
-			return reconcile.Result{}, nil
-		}
-		// Error reading the object - requeue the request.
-		return reconcile.Result{}, err
-	}
+// func (r *EnvironmentReconciler) Delete(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
+// 	// Fetch the Environment CR
+// 	environment := &envv1alpha1.Environment{}
+// 	err := r.Get(ctx, req.NamespacedName, environment)
+// 	if err != nil {
+// 		if errors.IsNotFound(err) {
+// 			// Environment CR not found, may have been deleted
+// 			return reconcile.Result{}, nil
+// 		}
+// 		// Error reading the object - requeue the request.
+// 		return reconcile.Result{}, err
+// 	}
 
-	// Fetch the corresponding namespace
-	namespaceName := environment.Name
-	namespace := &corev1.Namespace{}
-	err = r.Get(ctx, client.ObjectKey{Name: namespaceName}, namespace)
-	if err != nil && errors.IsNotFound(err) {
-		// Namespace not found, nothing to delete
-		return reconcile.Result{}, nil
-	} else if err != nil {
-		// Error fetching the namespace - requeue the request.
-		return reconcile.Result{}, err
-	}
+// 	// Fetch the corresponding namespace
+// 	namespaceName := environment.Name
+// 	namespace := &corev1.Namespace{}
+// 	err = r.Get(ctx, client.ObjectKey{Name: namespaceName}, namespace)
+// 	if err != nil && errors.IsNotFound(err) {
+// 		// Namespace not found, nothing to delete
+// 		return reconcile.Result{}, nil
+// 	} else if err != nil {
+// 		// Error fetching the namespace - requeue the request.
+// 		return reconcile.Result{}, err
+// 	}
 
-	// Delete the namespace
-	if err := r.Client.Delete(ctx, namespace); err != nil {
-		return reconcile.Result{}, err
-	}
+// 	// Delete the namespace
+// 	if err := r.Client.Delete(ctx, namespace); err != nil {
+// 		return reconcile.Result{}, err
+// 	}
 
-	// Delete the Environment CR
-	if err := r.Client.Delete(ctx, environment); err != nil {
-		return reconcile.Result{}, err
-	}
+// 	// Delete the Environment CR
+// 	if err := r.Client.Delete(ctx, environment); err != nil {
+// 		return reconcile.Result{}, err
+// 	}
 
-	// Update status to reflect deletion
-	environment.Status.NamespaceCreated = false
-	if err := r.Status().Update(ctx, environment); err != nil {
-		return reconcile.Result{}, err
-	}
+// 	// Update status to reflect deletion
+// 	environment.Status.NamespaceCreated = false
+// 	if err := r.Status().Update(ctx, environment); err != nil {
+// 		return reconcile.Result{}, err
+// 	}
 
-	l := log.FromContext(ctx)
-	l.Info("Reconcile delete", "req", req)
+// 	l := log.FromContext(ctx)
+// 	l.Info("Reconcile delete", "req", req)
 
-	return reconcile.Result{}, nil
-}
+// 	return reconcile.Result{}, nil
+// }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *EnvironmentReconciler) SetupWithManager(mgr ctrl.Manager) error {
