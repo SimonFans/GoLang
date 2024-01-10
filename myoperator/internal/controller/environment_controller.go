@@ -60,8 +60,9 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	// TODO(user): your logic here
 	env := &envv1alpha1.Environment{}
-	fmt.Println("env:", env)
 	err := r.Get(ctx, req.NamespacedName, env)
+	fmt.Println("request namespace: ", req.NamespacedName)
+	fmt.Println("env:", env)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Environment CR is not found, may have been deleted
@@ -113,55 +114,6 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// Namespace already exists, nothing to do
 	return reconcile.Result{}, nil
 }
-
-// Delete is called when an Environment resource is deleted
-// func (r *EnvironmentReconciler) Delete(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
-// 	fmt.Println("Calling Delete......")
-// 	// Fetch the Environment CR
-// 	environment := &envv1alpha1.Environment{}
-// 	err := r.Get(ctx, req.NamespacedName, environment)
-// 	if err != nil {
-// 		if errors.IsNotFound(err) {
-// 			// Environment CR not found, may have been deleted
-// 			return reconcile.Result{}, nil
-// 		}
-// 		// Error reading the object - requeue the request.
-// 		return reconcile.Result{}, err
-// 	}
-
-// 	// Fetch the corresponding namespace
-// 	namespaceName := environment.Name
-// 	namespace := &corev1.Namespace{}
-// 	err = r.Get(ctx, client.ObjectKey{Name: namespaceName}, namespace)
-// 	if err != nil && errors.IsNotFound(err) {
-// 		// Namespace not found, nothing to delete
-// 		return reconcile.Result{}, nil
-// 	} else if err != nil {
-// 		// Error fetching the namespace - requeue the request.
-// 		return reconcile.Result{}, err
-// 	}
-
-// 	// Delete the namespace
-// 	if err := r.Client.Delete(ctx, namespace); err != nil {
-// 		return reconcile.Result{}, err
-// 	}
-
-// 	// Delete the Environment CR
-// 	if err := r.Client.Delete(ctx, environment); err != nil {
-// 		return reconcile.Result{}, err
-// 	}
-
-// 	// Update status to reflect deletion
-// 	environment.Status.NamespaceCreated = false
-// 	if err := r.Status().Update(ctx, environment); err != nil {
-// 		return reconcile.Result{}, err
-// 	}
-
-// 	l := log.FromContext(ctx)
-// 	l.Info("Reconcile delete", "req", req)
-
-// 	return reconcile.Result{}, nil
-// }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *EnvironmentReconciler) SetupWithManager(mgr ctrl.Manager) error {
