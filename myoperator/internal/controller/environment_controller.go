@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -56,10 +57,10 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// _ = log.FromContext(ctx)
 	l := log.FromContext(ctx)
 	l.Info("Reconcile", "req", req)
-	// l.Info("Enter Reconcile ", req)
 
 	// TODO(user): your logic here
 	env := &envv1alpha1.Environment{}
+	fmt.Println("env:", env)
 	err := r.Get(ctx, req.NamespacedName, env)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -69,11 +70,12 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		// Error reading the object - requeue the request.
 		return reconcile.Result{}, err
 	}
-
+	fmt.Println("CR is found")
 	// Check if the corresponding namespace exists
 	namespaceName := env.Name
 	namespace := &corev1.Namespace{}
 	err = r.Get(ctx, types.NamespacedName{Name: namespaceName}, namespace)
+	fmt.Println("Printing error...", err)
 	if err != nil && errors.IsNotFound(err) {
 		// Namespace does not exist, create it
 		namespace = &corev1.Namespace{
@@ -88,31 +90,33 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		if err := r.Client.Create(ctx, namespace); err != nil {
 			return reconcile.Result{}, err
 		}
-
+		fmt.Println("Namespace created...")
 		// Namespace created successfully, update status
 		env.Status.NamespaceCreated = true
 		if err := r.Status().Update(ctx, env); err != nil {
 			return reconcile.Result{}, err
 		}
 
-		return reconcile.Result{Requeue: true}, nil
+		return reconcile.Result{}, nil
 	} else if err != nil {
 		// Error fetching the namespace - requeue the request.
 		return reconcile.Result{}, err
 	}
 
+	fmt.Printf("Check deletion timestamp value %v\n", env.ObjectMeta.DeletionTimestamp)
 	if !env.ObjectMeta.DeletionTimestamp.IsZero() {
 		// Skip creating the namespace if the Environment CR is being deleted
+		fmt.Println("In the deletion timestamp block")
 		return reconcile.Result{}, nil
 	}
-
+	fmt.Println("Before return...")
 	// Namespace already exists, nothing to do
 	return reconcile.Result{}, nil
-
 }
 
 // Delete is called when an Environment resource is deleted
 // func (r *EnvironmentReconciler) Delete(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
+// 	fmt.Println("Calling Delete......")
 // 	// Fetch the Environment CR
 // 	environment := &envv1alpha1.Environment{}
 // 	err := r.Get(ctx, req.NamespacedName, environment)
