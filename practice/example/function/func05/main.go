@@ -36,6 +36,7 @@ func main() {
 	triple := transformNumber(&input, tripleNumbers)
 	fmt.Println(double)
 	fmt.Println(triple)
+	// anonymous function
 	odds := getOddNumbers(&input, func(number int) int {
 		return number * 3
 	})
