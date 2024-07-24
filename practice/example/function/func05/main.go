@@ -20,10 +20,24 @@ func tripleNumbers(number int) int {
 	return number * 3
 }
 
+func getOddNumbers(slice *[]int, fn T) []int {
+	odds := make([]int, 0)
+	for _, val := range *slice {
+		if val%2 == 1 {
+			odds = append(odds, fn(val))
+		}
+	}
+	return odds
+}
+
 func main() {
 	input := []int{1, 2, 3, 4}
 	double := transformNumber(&input, doubleNumbers)
 	triple := transformNumber(&input, tripleNumbers)
 	fmt.Println(double)
 	fmt.Println(triple)
+	odds := getOddNumbers(&input, func(number int) int {
+		return number * 3
+	})
+	fmt.Println(odds)
 }
