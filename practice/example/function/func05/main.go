@@ -30,15 +30,49 @@ func getOddNumbers(slice *[]int, fn T) []int {
 	return odds
 }
 
+type person struct {
+	name    string
+	enabled bool
+}
+
+func defaultInfo(p *[]person, fn func(*person) *person) []*person {
+	updatedInfo := make([]*person, 0)
+	for _, pVal := range *p {
+		updatedInfo = append(updatedInfo, fn(&pVal))
+	}
+	return updatedInfo
+}
+
 func main() {
 	input := []int{1, 2, 3, 4}
 	double := transformNumber(&input, doubleNumbers)
 	triple := transformNumber(&input, tripleNumbers)
 	fmt.Println(double)
 	fmt.Println(triple)
-	// anonymous function
+	// anonymous function example 1
 	odds := getOddNumbers(&input, func(number int) int {
 		return number * 3
 	})
 	fmt.Println(odds)
+	// anonymous function example 2
+	personList := &[]person{
+		{
+			name: "",
+		},
+		{
+			name: "Mary",
+		},
+	}
+	personDefault := defaultInfo(personList, func(p *person) *person {
+		if p.name == "" {
+			p.name = "Ximeng"
+		}
+		if !p.enabled {
+			p.enabled = true
+		}
+		return p
+	})
+	for _, val := range personDefault {
+		fmt.Printf("%+v\n", val)
+	}
 }
