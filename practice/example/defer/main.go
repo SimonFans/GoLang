@@ -23,13 +23,25 @@ func test(x, y int) {
 	fmt.Println("x / y = ", z)
 }
 
+func test2(x, y int) int {
+	var z int
+	defer func() {
+		if recover() != nil {
+			z = 0
+		}
+		fmt.Println("z", z)
+	}()
+	return z
+}
+
 func main() {
 	num := 20
 	num = Substract(num)
 	fmt.Println(num)
 
 	test(6, 4)
-	test(0, 1)
 	test(1, 0)
+	z := test2(2, 0)
+	fmt.Println(z)
 
 }
